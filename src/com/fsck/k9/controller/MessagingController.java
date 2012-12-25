@@ -62,6 +62,7 @@ import com.fsck.k9.mail.PushReceiver;
 import com.fsck.k9.mail.Pusher;
 import com.fsck.k9.mail.Store;
 import com.fsck.k9.mail.Transport;
+import com.fsck.k9.mail.filter.FieldFilter;
 import com.fsck.k9.mail.internet.MimeMessage;
 import com.fsck.k9.mail.internet.MimeUtility;
 import com.fsck.k9.mail.internet.TextBody;
@@ -72,6 +73,7 @@ import com.fsck.k9.mail.store.LocalStore.PendingCommand;
 import com.fsck.k9.mail.store.UnavailableAccountException;
 import com.fsck.k9.mail.store.UnavailableStorageException;
 import com.fsck.k9.provider.EmailProvider;
+import com.fsck.k9.provider.EmailProvider.MessageColumns;
 import com.fsck.k9.provider.EmailProvider.StatsColumns;
 import com.fsck.k9.search.ConditionsTreeNode;
 import com.fsck.k9.search.LocalSearch;
@@ -976,6 +978,27 @@ public class MessagingController implements Runnable {
                 l.folderStatusChanged(account, folder, unreadMessageCount);
             }
 
+            /* FIXME: These filters need to be set in the user specified options, but this 
+             * filter code doesn't have a UI yet, so they're hardcoded while debugging. */
+            ArrayList<FieldFilter> filters = new ArrayList<FieldFilter>();
+            /* As email addresses are a name followed by the actual email address,
+             * checking the To, Cc, or from fields needs wildcards to match. These
+             * can match the name or the email address this way. 
+             */
+            filters.add(new FieldFilter("From", ".*@gnu.org.*", "Gnu"));
+            filters.add(new FieldFilter("To", ".*rob@senecas.com.*", "Senecass"));
+            /* The Subject field can contain many words, so of course needs wildcards
+             * to match. */
+            filters.add(new FieldFilter("Subject", ".*Gnash.*", "Gnash"));
+            
+            /* Check every new messages against the header field filters. */
+            Message[] allMessages = localFolder.getMessages(null);
+            for (Message message : allMessages) {
+            	for (FieldFilter filter : filters) {
+            		filter.runFilter(this, account, message);
+            	}
+            }
+            
             /* Notify listeners that we're finally done. */
 
             localFolder.setLastChecked(System.currentTimeMillis());
