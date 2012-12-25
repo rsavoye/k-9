@@ -28,13 +28,11 @@ public class FieldFilter {
 		mPattern = pattern;
 		mFolder = folder;
 	}
-	public boolean runFilter(MessagingController control, Account account, Message message) {
-		// Log.d("K9-Mail", "FieldFilter::runfilter()" + Address.toString(message.getFrom()));
-		
+	public boolean runFilter(MessagingController control, Account account, Message message) {		
 		if (mField.equalsIgnoreCase("Subject")) {
-			// Log.d("K9-Mail", "FieldFilter::runfilter()" + message.getSubject());
+			// Log.d("K9-Mail", "Checking Subject: " + message.getSubject());
 			if (message.getSubject().matches(mPattern)) {
-				Log.d("K9-Mail", "FieldFilter::runfilter() Matched Subject: " + message.getSubject());
+				Log.d("K9-Mail", "Matched Subject: " + message.getSubject());
 				String inbox = account.getInboxFolderName();
 				control.moveMessage(account, inbox, message, mFolder, null);
 				return true;
@@ -45,7 +43,7 @@ public class FieldFilter {
 		        for (Address address : addresses) {
 					// Log.d("K9-Mail", "checking To Address: " + address.getAddress());
 		        	if (address.toString().matches(mPattern)) {
-		        		Log.d("K9-Mail", "FieldFilter::runfilter() Matched To: " + address.toString());
+		        		Log.d("K9-Mail", "Matched To: " + address.toString());
 		        		String inbox = account.getInboxFolderName();
 		        		control.moveMessage(account, inbox, message, mFolder, null);
 		        		return true;
@@ -61,7 +59,7 @@ public class FieldFilter {
 				for (Address address : addresses) {
 					// Log.d("K9-Mail", "checking Cc Address: " + address.getAddress());
 					if (address.toString().matches(mPattern)) {
-						Log.d("K9-Mail", "FieldFilter::runfilter() Matched Cc: " + address.toString());
+						Log.d("K9-Mail", "Matched Cc: " + address.toString());
 						String inbox = account.getInboxFolderName();
 						control.moveMessage(account, inbox, message, mFolder, null);
 						return true;
@@ -76,7 +74,7 @@ public class FieldFilter {
 		        for (Address address : addresses) {
 					// Log.d("K9-Mail", "checking From Address: " + address.getAddress());
 		        	if (address.toString().matches(mPattern)) {
-		        		Log.d("K9-Mail", "FieldFilter::runfilter() Matched To: " + address.toString());
+		        		Log.d("K9-Mail", "Matched To: " + address.toString());
 		        		String inbox = account.getInboxFolderName();
 		        		control.moveMessage(account, inbox, message, mFolder, null);
 		        		return true;
@@ -96,3 +94,4 @@ public class FieldFilter {
 		mFolder = folder;
 	}
 }
+
