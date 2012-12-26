@@ -366,6 +366,11 @@ Please submit bug reports, contribute new features and ask questions at
     <string name="account_setup_account_type_imap_action">IMAP</string>
     <string name="account_setup_account_type_webdav_action">Exchange (WebDAV)</string>
 
+    <string name="account_setup_filters_title">Header filter settings</string>
+    <string name="account_setup_filters_field">Header Field</string>
+    <string name="account_setup_filters_pattern">Pattern</string>
+    <string name="account_setup_filters_folder">Folder</string>
+    
     <string name="account_setup_incoming_title">Incoming server settings</string>
     <string name="account_setup_incoming_username_label">Username</string>
     <string name="account_setup_incoming_password_label">Password</string>
@@ -651,6 +656,10 @@ Please submit bug reports, contribute new features and ask questions at
 
     <string name="account_settings_incoming_label">Incoming server</string>
     <string name="account_settings_incoming_summary">Configure the incoming mail server</string>
+    
+    <string name="account_settings_filters_label">Header Filters</string>
+    <string name="account_settings_filters_summary">Setup filters for incoming messages</string>
+    
     <string name="account_settings_outgoing_label">Outgoing server</string>
     <string name="account_settings_outgoing_summary">Configure the outgoing mail (SMTP) server</string>
     <string name="account_settings_description_label">Account name</string>
