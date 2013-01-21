@@ -221,6 +221,8 @@ Please submit bug reports, contribute new features and ask questions at
     <string name="notification_action_reply">Reply</string>
     <string name="notification_action_read">Read</string>
     <string name="notification_action_delete">Delete</string>
+    <string name="notification_certificate_error_title">Certificate error</string>
+    <string name="notification_certificate_error_text">Check your server settings</string>
 
     <string name="notification_bg_sync_ticker">Checking mail: <xliff:g id="account">%s</xliff:g>:<xliff:g id="folder">%s</xliff:g></string>
     <string name="notification_bg_sync_title">Checking mail</string>
@@ -322,6 +324,8 @@ Please submit bug reports, contribute new features and ask questions at
     <string name="global_settings_registered_name_color_label">Colorize contacts</string>
     <string name="global_settings_registered_name_color_default">Don\'t colorize names in your contact list</string>
     <string name="global_settings_registered_name_color_changed">Colorize names in your contact list</string>
+    <string name="global_settings_folderlist_wrap_folder_names_label">Wrap long folder names</string>
+    <string name="global_settings_folderlist_wrap_folder_names_summary">Use multiple lines to show long folder names</string>
 
     <string name="global_settings_messageview_fixedwidth_label">Fixed-width fonts</string>
     <string name="global_settings_messageview_fixedwidth_summary">Use a fixed-width font when showing plain-text messages</string>
@@ -815,6 +819,7 @@ Please submit bug reports, contribute new features and ask questions at
     <string name="accountlist_preferences">Account list</string>
     <string name="messagelist_preferences">Message lists</string>
     <string name="messageview_preferences">Messages</string>
+    <string name="folderlist_preferences">Folder lists</string>
     <string name="settings_theme_label">Theme</string>
     <string name="settings_language_label">Language</string>
 

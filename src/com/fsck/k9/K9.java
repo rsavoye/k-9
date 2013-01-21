@@ -234,6 +234,7 @@ public class K9 extends Application {
     private static String mQuietTimeStarts = null;
     private static String mQuietTimeEnds = null;
     private static String mAttachmentDefaultPath = "";
+    private static boolean mWrapFolderNames = false;
 
     private static boolean mBatchButtonsMarkRead = true;
     private static boolean mBatchButtonsDelete = true;
@@ -347,12 +348,14 @@ public class K9 extends Application {
 
 
 
-    public static final int NOTIFICATION_LED_SENDING_FAILURE_COLOR = 0xffff0000;
+    public static final int NOTIFICATION_LED_FAILURE_COLOR = 0xffff0000;
 
     // Must not conflict with an account number
     public static final int FETCHING_EMAIL_NOTIFICATION      = -5000;
     public static final int SEND_FAILED_NOTIFICATION      = -1500;
     public static final int CONNECTIVITY_ID = -3;
+    public static final int CERTIFICATE_EXCEPTION_NOTIFICATION_INCOMING = -4;
+    public static final int CERTIFICATE_EXCEPTION_NOTIFICATION_OUTGOING = -5;
 
 
     public static class Intents {
@@ -501,6 +504,7 @@ public class K9 extends Application {
         editor.putBoolean("messageViewFixedWidthFont", mMessageViewFixedWidthFont);
         editor.putBoolean("messageViewReturnToList", mMessageViewReturnToList);
         editor.putBoolean("messageViewShowNext", mMessageViewShowNext);
+        editor.putBoolean("wrapFolderNames", mWrapFolderNames);
 
         editor.putBoolean("batchButtonsMarkRead", mBatchButtonsMarkRead);
         editor.putBoolean("batchButtonsDelete", mBatchButtonsDelete);
@@ -655,7 +659,7 @@ public class K9 extends Application {
 
         int cachedVersion = sDatabaseVersionCache.getInt(KEY_LAST_ACCOUNT_DATABASE_VERSION, 0);
 
-        if (cachedVersion > 0 && cachedVersion <= LocalStore.DB_VERSION) {
+        if (cachedVersion >= LocalStore.DB_VERSION) {
             K9.setDatabasesUpToDate(false);
         }
     }
@@ -694,6 +698,7 @@ public class K9 extends Application {
         mMessageViewFixedWidthFont = sprefs.getBoolean("messageViewFixedWidthFont", false);
         mMessageViewReturnToList = sprefs.getBoolean("messageViewReturnToList", false);
         mMessageViewShowNext = sprefs.getBoolean("messageViewShowNext", false);
+        mWrapFolderNames = sprefs.getBoolean("wrapFolderNames", false);
 
         mBatchButtonsMarkRead = sprefs.getBoolean("batchButtonsMarkRead", true);
         mBatchButtonsDelete = sprefs.getBoolean("batchButtonsDelete", true);
@@ -1212,6 +1217,13 @@ public class K9 extends Application {
         } catch (NameNotFoundException e) {
             return false;
         }
+    }
+
+    public static boolean wrapFolderNames() {
+    	return mWrapFolderNames;
+    }
+    public static void setWrapFolderNames(final boolean state) {
+    	mWrapFolderNames = state;
     }
 
     public static String getAttachmentDefaultPath() {

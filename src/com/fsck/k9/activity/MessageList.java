@@ -11,8 +11,10 @@ import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,7 +60,7 @@ public class MessageList extends K9FragmentActivity implements MessageListFragme
     private static final String EXTRA_SPECIAL_FOLDER = "special_folder";
 
     // used for remote search
-    private static final String EXTRA_SEARCH_ACCOUNT = "com.fsck.k9.search_account";
+    public static final String EXTRA_SEARCH_ACCOUNT = "com.fsck.k9.search_account";
     private static final String EXTRA_SEARCH_FOLDER = "com.fsck.k9.search_folder";
 
     public static void actionDisplaySearch(Context context, SearchSpecification search,
@@ -114,6 +116,9 @@ public class MessageList extends K9FragmentActivity implements MessageListFragme
     private LocalSearch mSearch;
     private boolean mSingleFolderMode;
     private boolean mSingleAccountMode;
+    private ProgressBar mActionBarProgress;
+    private MenuItem mMenuButtonCheckMail;
+    private View mActionButtonIndeterminateProgress;
 
     /**
      * {@code true} if the message list should be displayed as flat list (i.e. no threading)
@@ -125,6 +130,12 @@ public class MessageList extends K9FragmentActivity implements MessageListFragme
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (UpgradeDatabases.actionUpgradeDatabases(this, getIntent())) {
+            finish();
+            return;
+        }
+
         setContentView(R.layout.message_list);
 
         mActionBar = getSupportActionBar();
@@ -180,7 +191,10 @@ public class MessageList extends K9FragmentActivity implements MessageListFragme
                 Bundle appData = getIntent().getBundleExtra(SearchManager.APP_DATA);
                 if (appData != null) {
                     mSearch.addAccountUuid(appData.getString(EXTRA_SEARCH_ACCOUNT));
-                    mSearch.addAllowedFolder(appData.getString(EXTRA_SEARCH_FOLDER));
+                    // searches started from a folder list activity will provide an account, but no folder
+                    if (appData.getString(EXTRA_SEARCH_FOLDER) != null) {
+                        mSearch.addAllowedFolder(appData.getString(EXTRA_SEARCH_FOLDER));
+                    }
                 } else {
                     mSearch.addAccountUuid(LocalSearch.ALL_ACCOUNTS);
                 }
@@ -246,6 +260,9 @@ public class MessageList extends K9FragmentActivity implements MessageListFragme
         mActionBarTitle = (TextView) customView.findViewById(R.id.actionbar_title_first);
         mActionBarSubTitle = (TextView) customView.findViewById(R.id.actionbar_title_sub);
         mActionBarUnread = (TextView) customView.findViewById(R.id.actionbar_unread_count);
+        mActionBarProgress = (ProgressBar) customView.findViewById(R.id.actionbar_progress);
+        mActionButtonIndeterminateProgress =
+                getLayoutInflater().inflate(R.layout.actionbar_indeterminate_progress_actionview, null);
 
         mActionBar.setDisplayHomeAsUpEnabled(true);
     }
@@ -463,6 +480,7 @@ public class MessageList extends K9FragmentActivity implements MessageListFragme
     public boolean onCreateOptionsMenu(Menu menu) {
         getSupportMenuInflater().inflate(R.menu.message_list_option, menu);
         mMenu = menu;
+        mMenuButtonCheckMail= menu.findItem(R.id.check_mail);
         return true;
     }
 
@@ -733,6 +751,26 @@ public class MessageList extends K9FragmentActivity implements MessageListFragme
             onAccounts();
         } else {
             onShowFolderList();
+        }
+    }
+
+    public void enableActionBarProgress(boolean enable) {
+        if (mMenuButtonCheckMail != null && mMenuButtonCheckMail.isVisible()) {
+            mActionBarProgress.setVisibility(ProgressBar.GONE);
+            if (enable) {
+                mMenuButtonCheckMail
+                        .setActionView(mActionButtonIndeterminateProgress);
+            } else {
+                mMenuButtonCheckMail.setActionView(null);
+            }
+        } else {
+            if (mMenuButtonCheckMail != null)
+                mMenuButtonCheckMail.setActionView(null);
+            if (enable) {
+                mActionBarProgress.setVisibility(ProgressBar.VISIBLE);
+            } else {
+                mActionBarProgress.setVisibility(ProgressBar.GONE);
+            }
         }
     }
 }

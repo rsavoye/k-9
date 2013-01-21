@@ -804,6 +804,9 @@ public class MessagingController implements Runnable {
         threadPool.execute(new Runnable() {
             @Override
             public void run() {
+                if (listener != null) {
+                    listener.enableProgressIndicator(true);
+                }
                 try {
                     Store remoteStore = account.getRemoteStore();
                     LocalStore localStore = account.getLocalStore();
@@ -822,6 +825,10 @@ public class MessagingController implements Runnable {
                 } catch (MessagingException e) {
                     Log.e(K9.LOG_TAG, "Exception in loadSearchResults: " + e);
                     addErrorMessage(account, null, e);
+                } finally {
+                    if (listener != null) {
+                        listener.enableProgressIndicator(false);
+                    }
                 }
             }
         });
@@ -859,7 +866,7 @@ public class MessagingController implements Runnable {
             LocalStore localStore = account.getLocalStore();
             LocalFolder localFolder = localStore.getFolder(folder);
             if (localFolder.getVisibleLimit() > 0) {
-                localFolder.setVisibleLimit(localFolder.getVisibleLimit() + localFolder.getMessageCount());
+                localFolder.setVisibleLimit(localFolder.getVisibleLimit() + account.getDisplayCount());
             }
             synchronizeMailbox(account, folder, listener, null);
         } catch (MessagingException me) {
@@ -3342,11 +3349,28 @@ public class MessagingController implements Runnable {
         PendingIntent pi = PendingIntent.getActivity(mApplication, 0, i, 0);
         builder.setContentIntent(pi);
 
-        configureNotification(builder,  null, null, K9.NOTIFICATION_LED_SENDING_FAILURE_COLOR,
+        configureNotification(builder,  null, null, K9.NOTIFICATION_LED_FAILURE_COLOR,
                 K9.NOTIFICATION_LED_BLINK_FAST, true);
 
         notifMgr.notify(K9.SEND_FAILED_NOTIFICATION - account.getAccountNumber(),
                 builder.build());
+    }
+
+    public void notify(String tag, int id, String title, String text, PendingIntent pi) {
+        final NotificationManager notifMgr = (NotificationManager) mApplication
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mApplication);
+        builder.setSmallIcon(R.drawable.stat_notify_email_generic);
+        builder.setWhen(System.currentTimeMillis());
+        builder.setAutoCancel(true);
+        builder.setTicker(title);
+        builder.setContentTitle(title);
+        builder.setContentText(text);
+        builder.setContentIntent(pi);
+        configureNotification(builder, null, null,
+                K9.NOTIFICATION_LED_FAILURE_COLOR,
+                K9.NOTIFICATION_LED_BLINK_FAST, true);
+        notifMgr.notify(tag, id, builder.build());
     }
 
     /**
@@ -4869,8 +4893,8 @@ public class MessagingController implements Runnable {
             targetIntent = FolderList.actionHandleNotification(context, account, initialFolder);
         }
 
-        PendingIntent pi = PendingIntent.getActivity(context, 0, targetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.setContentIntent(pi);
+        builder.setContentIntent(PendingIntent.getActivity(context,
+                account.getAccountNumber(), targetIntent, PendingIntent.FLAG_UPDATE_CURRENT));
         builder.setDeleteIntent(NotificationActionService.getAcknowledgeIntent(context, account));
 
         // Only ring or vibrate if we have not done so already on this account and fetch
